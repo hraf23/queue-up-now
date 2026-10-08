@@ -10,33 +10,53 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SSlugIndexRouteImport } from './routes/s.$slug.index'
+import { Route as SSlugBoardRouteImport } from './routes/s.$slug.board'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SSlugIndexRoute = SSlugIndexRouteImport.update({
+  id: '/s/$slug/',
+  path: '/s/$slug/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SSlugBoardRoute = SSlugBoardRouteImport.update({
+  id: '/s/$slug/board',
+  path: '/s/$slug/board',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/s/$slug/board': typeof SSlugBoardRoute
+  '/s/$slug/': typeof SSlugIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/s/$slug/board': typeof SSlugBoardRoute
+  '/s/$slug': typeof SSlugIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/s/$slug/board': typeof SSlugBoardRoute
+  '/s/$slug/': typeof SSlugIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/s/$slug/board' | '/s/$slug/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/s/$slug/board' | '/s/$slug'
+  id: '__root__' | '/' | '/s/$slug/board' | '/s/$slug/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  SSlugBoardRoute: typeof SSlugBoardRoute
+  SSlugIndexRoute: typeof SSlugIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +68,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/s/$slug/': {
+      id: '/s/$slug/'
+      path: '/s/$slug'
+      fullPath: '/s/$slug/'
+      preLoaderRoute: typeof SSlugIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/s/$slug/board': {
+      id: '/s/$slug/board'
+      path: '/s/$slug/board'
+      fullPath: '/s/$slug/board'
+      preLoaderRoute: typeof SSlugBoardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  SSlugBoardRoute: SSlugBoardRoute,
+  SSlugIndexRoute: SSlugIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
