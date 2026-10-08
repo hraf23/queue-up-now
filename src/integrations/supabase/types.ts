@@ -14,7 +14,94 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      queue_entries: {
+        Row: {
+          called_at: string | null
+          created_at: string
+          finished_at: string | null
+          id: string
+          name: string
+          shop_id: string
+          started_at: string | null
+          status: string
+        }
+        Insert: {
+          called_at?: string | null
+          created_at?: string
+          finished_at?: string | null
+          id?: string
+          name: string
+          shop_id: string
+          started_at?: string | null
+          status?: string
+        }
+        Update: {
+          called_at?: string | null
+          created_at?: string
+          finished_at?: string | null
+          id?: string
+          name?: string
+          shop_id?: string
+          started_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "queue_entries_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shop_secrets: {
+        Row: {
+          admin_key: string
+          shop_id: string
+        }
+        Insert: {
+          admin_key: string
+          shop_id: string
+        }
+        Update: {
+          admin_key?: string
+          shop_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_secrets_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: true
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shops: {
+        Row: {
+          avg_cut_minutes: number
+          created_at: string
+          id: string
+          name: string
+          slug: string
+        }
+        Insert: {
+          avg_cut_minutes?: number
+          created_at?: string
+          id?: string
+          name: string
+          slug: string
+        }
+        Update: {
+          avg_cut_minutes?: number
+          created_at?: string
+          id?: string
+          name?: string
+          slug?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
