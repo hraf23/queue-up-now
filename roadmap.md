@@ -1,0 +1,4 @@
+- [ ] Ajouter connexion, inscription, profils et récupération du mot de passe.
+- [ ] Relier les nouveaux salons aux comptes et conserver les anciens liens privés.
+- [ ] Renforcer l’identité barbier et traduire les écrans en français.
+- [ ] Vérifier les parcours et les pages.
