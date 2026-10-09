@@ -1,90 +1,15 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
-import { Scissors, QrCode, Bell, Timer } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowRight, Scissors, QrCode, Users, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { createShop } from "@/lib/queue.functions";
-
-export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "NextChair — QR walk-in queue for barber shops" },
-      { name: "description", content: "Let walk-ins scan, join the line and see their live wait. Run your queue in one tap." },
-      { property: "og:title", content: "NextChair — QR walk-in queue for barber shops" },
-      { property: "og:description", content: "Scan, join, get called. A zero-friction walk-in queue for barbers." },
-    ],
-  }),
-  component: Index,
-});
-
-function Index() {
-  const nav = useNavigate();
-  const [name, setName] = useState("");
-  const [avg, setAvg] = useState(20);
-  const [busy, setBusy] = useState(false);
-  const [err, setErr] = useState("");
-
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    setBusy(true);
-    setErr("");
-    try {
-      const r = await createShop({ data: { name, avgMinutes: avg } });
-      localStorage.setItem(`nc-key-${r.slug}`, r.adminKey);
-      nav({ to: "/s/$slug/board", params: { slug: r.slug }, search: { key: r.adminKey } });
-    } catch {
-      setErr("Something went wrong. Try again.");
-      setBusy(false);
-    }
-  }
-
-  return (
-    <div className="min-h-screen">
-      <div className="pole h-3" />
-      <main className="mx-auto grid max-w-5xl gap-12 px-5 py-12 md:grid-cols-2 md:py-20">
-        <section>
-          <div className="flex items-center gap-2 text-primary">
-            <Scissors className="h-5 w-5" />
-            <span className="font-display text-2xl tracking-wide">NextChair</span>
-          </div>
-          <h1 className="mt-6 font-display text-6xl leading-[0.9] md:text-7xl">
-            No more “who’s next?”
-          </h1>
-          <p className="mt-5 max-w-md text-lg text-muted-foreground">
-            Walk-ins scan your QR code, drop their name, and watch their spot move live. You call them to the chair in one tap.
-          </p>
-          <ul className="mt-8 space-y-3">
-            {[
-              [QrCode, "Print a QR code for the counter"],
-              [Timer, "Live position & wait time on their phone"],
-              [Bell, "“You’re up!” alert when it’s their turn"],
-            ].map(([I, t], i) => {
-              const Icon = I as typeof QrCode;
-              return (
-                <li key={i} className="flex items-center gap-3">
-                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-secondary text-secondary-foreground">
-                    <Icon className="h-4 w-4" />
-                  </span>
-                  <span className="font-medium">{t as string}</span>
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-        <form onSubmit={submit} className="self-start rounded-3xl border bg-card p-7 shadow-sm">
-          <h2 className="font-display text-3xl">Open your shop’s queue</h2>
-          <p className="mt-1 text-sm text-muted-foreground">Takes 5 seconds. No account needed.</p>
-          <label className="mt-6 block text-sm font-semibold">Shop name</label>
-          <Input className="mt-2 h-12 text-base" value={name} onChange={(e) => setName(e.target.value)} placeholder="Fade Factory" required maxLength={60} />
-          <label className="mt-5 block text-sm font-semibold">Average cut time: {avg} min</label>
-          <input type="range" min={5} max={60} step={5} value={avg} onChange={(e) => setAvg(+e.target.value)} className="mt-3 w-full accent-primary" />
-          {err && <p className="mt-3 text-sm text-destructive">{err}</p>}
-          <Button type="submit" disabled={busy || !name.trim()} className="mt-6 h-12 w-full text-base font-semibold">
-            {busy ? "Creating…" : "Create queue"}
-          </Button>
-          <p className="mt-3 text-xs text-muted-foreground">You’ll get a private barber board link — bookmark it.</p>
-        </form>
-      </main>
-    </div>
-  );
-}
+import { SiteHeader } from "@/components/site-header";
+import { useAuth } from "@/lib/auth-context";
+import photo from "@/assets/barber-shop.jpg";
+export const Route = createFileRoute("/")({ head: () => ({ meta: [{title:"NextChair — Votre tour chez le barbier"},{name:"description",content:"L’espace des barbiers et de leurs clients : salons, file d’attente en direct et accès par QR code."},{property:"og:title",content:"NextChair — Votre tour chez le barbier"},{property:"og:description",content:"Un salon bien organisé. Des clients qui attendent sereinement."},{property:"og:type",content:"website"},{name:"twitter:card",content:"summary_large_image"}] }), component: Index });
+function Index(){const {user}=useAuth();return <><SiteHeader/><main>
+ <section className="relative isolate min-h-[440px] overflow-hidden bg-secondary text-secondary-foreground md:min-h-[500px]">
+ <img src={photo} alt="Un barbier réalise une coupe dans un salon moderne" width={1536} height={1024} fetchPriority="high" className="absolute inset-0 h-full w-full object-cover object-center"/>
+ <div className="hero-shade absolute inset-0"/>
+ <div className="relative mx-auto max-w-6xl px-5 py-14 md:py-20"><p className="mb-5 flex items-center gap-2 text-sm font-semibold uppercase"><span className="h-2 w-2 rounded-full bg-primary"/>Pour les barbiers. Pour leurs clients.</p><h1 className="font-display text-7xl leading-none md:text-8xl">NextChair<span className="text-primary">.</span></h1><p className="mt-4 max-w-md text-2xl font-medium">Votre tour chez le barbier.<br/>Sans perdre votre temps.</p><div className="mt-8 flex flex-wrap gap-3"><Button size="lg" className="h-12" asChild><Link to={user?"/account":"/auth"}>Je suis barbier<Scissors/></Link></Button><Button size="lg" variant="outline" className="h-12 border-secondary-foreground/40 bg-secondary/60 text-secondary-foreground hover:bg-secondary" asChild><Link to="/clients">Je suis client<ArrowRight/></Link></Button></div></div>
+ </section>
+ <section className="mx-auto max-w-6xl px-5 py-10"><div className="flex flex-wrap items-end justify-between gap-3"><div><p className="text-xs font-semibold uppercase text-primary">Chacun son espace</p><h2 className="mt-2 font-display text-4xl">Une belle coupe commence ici.</h2></div><span className="text-sm text-muted-foreground">Moins d’attente. Plus de style.</span></div><div className="mt-7 grid gap-7 md:grid-cols-2"><article className="rounded-lg border bg-card p-6"><Scissors className="h-7 w-7 text-primary"/><h3 className="mt-4 font-display text-3xl">Espace barbier</h3><p className="mt-2 text-muted-foreground">Votre salon, votre file d’attente et vos clients au même endroit.</p><div className="mt-5 flex flex-wrap gap-5 text-sm"><span className="flex items-center gap-2"><Users className="h-4 w-4 text-primary"/>File en direct</span><span className="flex items-center gap-2"><QrCode className="h-4 w-4 text-primary"/>QR du salon</span></div><Button variant="link" className="mt-5 px-0" asChild><Link to={user?"/account":"/auth"}>Accéder à mon espace<ArrowRight/></Link></Button></article><article className="rounded-lg border bg-card p-6"><Users className="h-7 w-7 text-accent"/><h3 className="mt-4 font-display text-3xl">Espace client</h3><p className="mt-2 text-muted-foreground">Choisissez votre barbier et retrouvez votre place dans la file.</p><div className="mt-5 flex flex-wrap gap-5 text-sm"><span className="flex items-center gap-2"><Clock className="h-4 w-4 text-accent"/>Attente estimée</span><span className="flex items-center gap-2"><Scissors className="h-4 w-4 text-accent"/>Sans rendez-vous</span></div><Button variant="link" className="mt-5 px-0" asChild><Link to="/clients">Trouver un salon<ArrowRight/></Link></Button></article></div></section>
+ </main><footer className="border-t px-5 py-5 text-center text-sm text-muted-foreground">NextChair · Le rendez-vous des sans rendez-vous.</footer></>;}
